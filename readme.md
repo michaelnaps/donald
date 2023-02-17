@@ -2,8 +2,12 @@
 
 This repository serves as the testing grounds for functions and classes that will be used for the development of my personal robot, Daffy.
 
-Model Equation:
-$$x = \left[ \begin{matrix} x \\ y \\ \theta \end{matrix} \right]$$
+State/Model Selection:
+$$
+    x = \left[ \begin{matrix}
+        x \\ y \\ \theta
+    \end{matrix} \right]
+$$
 $$
     \dot{x} = \left[ \begin{matrix}
         \dot x_1 \\ \dot x_2 \\ \dot x_3
