@@ -75,6 +75,7 @@ class Parameters:
 
         return self;
 
+
 def modelFunc(x, u, _):
     dx = np.array( [
         [np.cos(x[2])*(u[0] + u[1])],
@@ -90,7 +91,7 @@ def callbackFunc(T, x, u, mvar):
 if __name__ == "__main__":
     # initialize states
     x0 = np.array( [[0],[0],[pi/2]] );
-    u0 = np.array( [[0],[10]] );
+    u0 = np.array( [[-10],[10]] );
 
     # create model class variable
     model_type = 'continuous';
