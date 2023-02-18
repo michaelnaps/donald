@@ -29,30 +29,46 @@ class Parameters:
             self.fig = fig;
             self.axs = axs;
 
-        self.axs.set_xlim(-5,5);
-        self.axs.set_ylim(-5,5);
+        self.axs.set_xlim(-2,2);
+        self.axs.set_ylim(-2,2);
         self.axs.axis('equal');
         self.axs.grid();
         self.fig.tight_layout();
 
         # initialize buffer (trail)
         self.color = color;
+        self.width = 0.05;
+        self.length = R/2;
 
         self.buffer = np.kron( np.ones( (buffer_length, 1) ), x0[:2].reshape(1,2));
         self.trail_patch = patch.PathPatch(path.Path(self.buffer), color=self.color);
 
+        dx1 = self.length*np.cos(x0[2]);
+        dx2 = self.length*np.sin(x0[2]);
+        self.orientation = patch.Arrow(x0[0], x0[1], dx1, dx2,
+                                       width=self.width, color=self.color);
+
         self.axs.add_patch(self.trail_patch);
+        self.axs.add_patch(self.orientation);
 
         self.pause = pause;
 
     def update(self, t, x):
         self.trail_patch.remove();
+        self.orientation.remove();
 
         self.buffer[:-1] = self.buffer[1:];
         self.buffer[-1] = x[:2];
 
         self.trail_patch = patch.PathPatch(path.Path(self.buffer), fill=0);
+
+        dx1 = self.length*np.cos(x[2]);
+        dx2 = self.length*np.sin(x[2]);
+        self.orientation = patch.Arrow(x[0], x[1], dx1, dx2,
+                                       width=self.width, color=self.color);
+
         self.axs.add_patch(self.trail_patch);
+        self.axs.add_patch(self.orientation);
 
         plt.show(block=0);
         plt.pause(self.pause);
