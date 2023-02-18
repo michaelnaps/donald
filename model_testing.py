@@ -91,7 +91,7 @@ def callbackFunc(T, x, u, mvar):
 if __name__ == "__main__":
     # initialize states
     x0 = np.array( [[0],[0],[pi/2]] );
-    u0 = np.array( [[-10],[10]] );
+    u0 = np.array( [[0.1],[0.2]] );
 
     # create model class variable
     model_type = 'continuous';
