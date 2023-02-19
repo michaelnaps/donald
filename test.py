@@ -104,5 +104,5 @@ if __name__ == "__main__":
                 PH_length = 1, time_step=dt, model_type=model_type);
 
     # solve single time-step
-    uinit = np.zeros( (Nu*mpcvar.PH_length, 1) );
-    print(mpcvar.solve(q0, uinit))
+    uinit = np.zeros( (Nu*mpcvar.PH,) );
+    print(mpcvar.solve(x0, uinit))
