@@ -1,9 +1,10 @@
 # script for model equation testing
 import sys
 sys.path.insert(0, '/home/michaelnaps/prog/ode');
+sys.path.insert(0, '/home/michaelnaps/prog/mpc');
 
 import numpy as np
-import ode
+import mpc
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patch
@@ -84,6 +85,9 @@ def modelFunc(x, u, _):
     ] );
     return dx;
 
+def costFunc(mpcvar, qlist, ulist):
+    return 0;
+
 def callbackFunc(T, x, u, mvar):
     return mvar.params.update(T, x);
 
@@ -91,14 +95,14 @@ def callbackFunc(T, x, u, mvar):
 if __name__ == "__main__":
     # initialize states
     x0 = np.array( [[0],[0],[pi/2]] );
-    u0 = np.array( [[0.1],[0.2]] );
+    u0 = np.array( [[1],[2]] );
 
-    # create model class variable
+    # create MPC class variable
     model_type = 'continuous';
     params = Parameters(x0, buffer_length=10);
-    daffy = ode.Model(modelFunc, model_type,
-                      x0=x0, Nu=Nu, dt=dt, params=params);
+    mpcvar = mpc.ModelPredictiveControl('nno', modelFunc, costFunc, params, Nu,
+                PH_length = 1, time_step=dt, model_type=model_type);
 
-    # simulate model
-    sim_time = 10;
-    daffy.simulate(sim_time, x0, u0=u0, callback=callbackFunc);
+    # solve single time-step
+    uinit = np.zeros( (Nu*mpcvar.PH_length, 1) );
+    print(mpcvar.solve(q0, uinit))
