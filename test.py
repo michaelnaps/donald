@@ -3,8 +3,8 @@ import sys
 sys.path.insert(0, '/home/michaelnaps/prog/ode');
 sys.path.insert(0, '/home/michaelnaps/prog/mpc');
 
-import numpy as np
 import mpc
+import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patch
@@ -41,7 +41,7 @@ class Parameters:
         self.width = 0.05;
         self.length = R/2;
 
-        self.buffer = np.kron( np.ones( (buffer_length, 1) ), x0[:2].reshape(1,2));
+        self.buffer = np.kron( np.ones( (buffer_length, 1) ), x0[:2]);
         self.trail_patch = patch.PathPatch(path.Path(self.buffer), color=self.color);
 
         dx1 = self.length*np.cos(x0[2]);
@@ -78,11 +78,11 @@ class Parameters:
 
 
 def modelFunc(x, u, _):
-    dx = np.array( [
-        [np.cos(x[2])*(u[0] + u[1])],
-        [np.sin(x[2])*(u[0] + u[1])],
-        [1/R*(u[0] - u[1])]
-    ] );
+    dx = [
+        np.cos(x[2])*(u[0] + u[1]),
+        np.sin(x[2])*(u[0] + u[1]),
+        1/R*(u[0] - u[1])
+    ]
     return dx;
 
 def costFunc(mpcvar, qlist, ulist):
@@ -94,15 +94,15 @@ def callbackFunc(T, x, u, mvar):
 
 if __name__ == "__main__":
     # initialize states
-    x0 = np.array( [[0],[0],[pi/2]] );
-    u0 = np.array( [[1],[2]] );
+    x0 = [0,0,pi/2];
+    u0 = [1,2];
 
     # create MPC class variable
     model_type = 'continuous';
     params = Parameters(x0, buffer_length=10);
     mpcvar = mpc.ModelPredictiveControl('nno', modelFunc, costFunc, params, Nu,
-                PH_length = 1, time_step=dt, model_type=model_type);
+                num_ssvar=Nx, PH_length=1, time_step=dt, model_type=model_type);
 
     # solve single time-step
-    uinit = np.zeros( (Nu*mpcvar.PH,) );
+    uinit = [0 for i in range(Nu*mpcvar.PH)];
     print(mpcvar.solve(x0, uinit))
