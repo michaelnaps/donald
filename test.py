@@ -4,15 +4,15 @@ sys.path.insert(0, '/home/michaelnaps/prog/ode');
 sys.path.insert(0, '/home/michaelnaps/prog/mpc');
 
 import mpc
-import numpy as np
 
+import math
 import matplotlib.pyplot as plt
 import matplotlib.patches as patch
 import matplotlib.path as path
 
 
 # hyper parameter(s)
-pi = np.pi;
+pi = math.pi;
 Nx = 3;
 Nu = 2;
 R = 1/2;  # robot-body radius
@@ -20,7 +20,7 @@ dt = 0.01;
 
 
 class Parameters:
-    def __init__(self, x0,
+    def __init__(self, x0, xd,
                  fig=None, axs=None,
                  buffer_length=10, pause=1e-3,
                  color='k'):
@@ -41,11 +41,11 @@ class Parameters:
         self.width = 0.05;
         self.length = R/2;
 
-        self.buffer = np.kron( np.ones( (buffer_length, 1) ), x0[:2]);
+        self.buffer = [x0[:2] for i in range(buffer_length)];
         self.trail_patch = patch.PathPatch(path.Path(self.buffer), color=self.color);
 
-        dx1 = self.length*np.cos(x0[2]);
-        dx2 = self.length*np.sin(x0[2]);
+        dx1 = self.length*math.cos(x0[2]);
+        dx2 = self.length*math.sin(x0[2]);
         self.orientation = patch.Arrow(x0[0], x0[1], dx1, dx2,
                                        width=self.width, color=self.color);
 
@@ -53,6 +53,7 @@ class Parameters:
         self.axs.add_patch(self.orientation);
 
         self.pause = pause;
+        self.xd = xd;
 
     def update(self, t, x):
         self.trail_patch.remove();
@@ -63,8 +64,8 @@ class Parameters:
 
         self.trail_patch = patch.PathPatch(path.Path(self.buffer), fill=0);
 
-        dx1 = self.length*np.cos(x[2]);
-        dx2 = self.length*np.sin(x[2]);
+        dx1 = self.length*math.cos(x[2]);
+        dx2 = self.length*math.sin(x[2]);
         self.orientation = patch.Arrow(x[0], x[1], dx1, dx2,
                                        width=self.width, color=self.color);
 
@@ -79,30 +80,60 @@ class Parameters:
 
 def modelFunc(x, u, _):
     dx = [
-        np.cos(x[2])*(u[0] + u[1]),
-        np.sin(x[2])*(u[0] + u[1]),
+        math.cos(x[2])*(u[0] + u[1]),
+        math.sin(x[2])*(u[0] + u[1]),
         1/R*(u[0] - u[1])
     ]
     return dx;
 
-def costFunc(mpcvar, qlist, ulist):
-    return 0;
+def costFunc(mpc_var, xlist, ulist):
+    xd = mpc_var.params.xd;
+    Nu = mpc_var.u_num;
+    PH = mpc_var.PH;
 
-def callbackFunc(T, x, u, mvar):
-    return mvar.params.update(T, x);
+    kx = 150;
+    ko = 1;
+    ku = 0.1;
+
+    C = 0;
+    k = 0;
+    for i, x in enumerate(xlist):
+        C += kx*(x[0] - xd[0])**2;
+        C += kx*(x[1] - xd[1])**2;
+        C += ko*(x[2] - xd[2])**2;
+
+        if (i != PH):
+            C += ku*(ulist[k]**2 + ulist[k+1]**2);
+            k += Nu;
+
+    return C;
+
+def callbackFunc(mpc_var, T, x, u):
+    return mpc_var.params.update(T, x);
 
 
 if __name__ == "__main__":
     # initialize states
     x0 = [0,0,pi/2];
-    u0 = [1,2];
+    xd = [1,1,pi/2];
 
     # create MPC class variable
+    PH = 5;
+    kl = 2;
     model_type = 'continuous';
-    params = Parameters(x0, buffer_length=10);
-    mpcvar = mpc.ModelPredictiveControl('nno', modelFunc, costFunc, params, Nu,
-                num_ssvar=Nx, PH_length=1, time_step=dt, model_type=model_type);
+    params = Parameters(x0, xd, buffer_length=10);
+    mpc_var = mpc.ModelPredictiveControl('ngd', modelFunc, costFunc, params, Nu,
+        num_ssvar=Nx, PH_length=PH, knot_length=kl, time_step=dt, model_type=model_type);
+    mpc_var.setAlpha(0.01);
 
     # solve single time-step
-    uinit = [0 for i in range(Nu*mpcvar.PH)];
-    print(mpcvar.solve(x0, uinit))
+    sim_time = 10;
+    uinit = [0 for i in range(Nu*mpc_var.PH)];
+    sim_results = mpc_var.sim_root(sim_time, x0, uinit,
+        callback=callbackFunc, output=0);
+    plt.close('all');
+
+    T = sim_results[0];
+    xlist = sim_results[1];
+    ulist = sim_results[2];
+    tlist = sim_results[6];
