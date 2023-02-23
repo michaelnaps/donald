@@ -91,16 +91,27 @@ def costFunc(mpc_var, xlist, ulist):
     Nu = mpc_var.u_num;
     PH = mpc_var.PH;
 
-    kx = 150;
-    ko = 1;
-    ku = 0.1;
+    TOL = 1e-3;
+
+    kh = 1000;
+    kl = 10;
+    ku = 1;
 
     C = 0;
     k = 0;
     for i, x in enumerate(xlist):
-        C += kx*(x[0] - xd[0])**2;
-        C += kx*(x[1] - xd[1])**2;
-        C += ko*(x[2] - xd[2])**2;
+        dx = (x[0] - xd[0])**2 + (x[1] - xd[1])**2;
+        do = (x[2] - xd[2])**2;
+
+        if dx < TOL:
+            kx = kl;
+            ko = kh;
+        else:
+            kx = kh;
+            ko = kl;
+
+        C += kx*dx;
+        C += ko*do;
 
         if (i != PH):
             C += ku*(ulist[k]**2 + ulist[k+1]**2);
@@ -130,7 +141,7 @@ if __name__ == "__main__":
     sim_time = 10;
     uinit = [0 for i in range(Nu*mpc_var.PH)];
     sim_results = mpc_var.sim_root(sim_time, x0, uinit,
-        callback=callbackFunc, output=0);
+        callback=callbackFunc, output=1);
     plt.close('all');
 
     T = sim_results[0];
