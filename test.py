@@ -4,6 +4,7 @@ sys.path.insert(0, '/home/michaelnaps/prog/ode');
 sys.path.insert(0, '/home/michaelnaps/prog/mpc');
 
 import mpc
+from numpy import random as rd
 
 import math
 import matplotlib.pyplot as plt
@@ -87,28 +88,30 @@ def modelFunc(x, u, _):
     return dx;
 
 def costFunc(mpc_var, xlist, ulist):
+    # grab class variables
     xd = mpc_var.params.xd;
     Nu = mpc_var.u_num;
     PH = mpc_var.PH;
 
-    TOL = 1e-3;
-
+    # gain parameters
+    TOL = 1e-6;
     kh = 1000;
     kl = 10;
     ku = 1;
 
+    # calculate cost of current input and state
     C = 0;
     k = 0;
     for i, x in enumerate(xlist):
         dx = (x[0] - xd[0])**2 + (x[1] - xd[1])**2;
         do = (x[2] - xd[2])**2;
 
-        if dx < TOL:
-            kx = kl;
-            ko = kh;
-        else:
+        if dx > TOL:
             kx = kh;
             ko = kl;
+        else:
+            kx = kl;
+            ko = kh;
 
         C += kx*dx;
         C += ko*do;
@@ -126,7 +129,7 @@ def callbackFunc(mpc_var, T, x, u):
 if __name__ == "__main__":
     # initialize states
     x0 = [0,0,pi/2];
-    xd = [1,1,pi/2];
+    xd = [1,1,3*pi/2];
 
     # create MPC class variable
     PH = 5;
