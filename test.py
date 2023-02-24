@@ -104,7 +104,7 @@ def costFunc(mpc_var, xlist, ulist):
     k = 0;
     for i, x in enumerate(xlist):
         dx = (x[0] - xd[0])**2 + (x[1] - xd[1])**2;
-        do = (x[2] - xd[2])**2;
+        do = (math.cos(x[2]) - math.cos(xd[2]))**2 + (math.sin(x[2]) - math.sin(xd[2]))**2;
 
         if dx > TOL:
             kx = kh;
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     PH = 5;
     kl = 2;
     model_type = 'continuous';
-    params = Parameters(x0, xd, buffer_length=10);
+    params = Parameters(x0, xd, buffer_length=25);
     mpc_var = mpc.ModelPredictiveControl('ngd', modelFunc, costFunc, params, Nu,
         num_ssvar=Nx, PH_length=PH, knot_length=kl, time_step=dt, model_type=model_type);
     mpc_var.setAlpha(0.01);
