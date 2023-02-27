@@ -131,12 +131,12 @@ def cost(mpc_var, xlist, ulist):
         dx = (x[0] - xd[0])**2 + (x[1] - xd[1])**2;
         do = (x[2] - xd[2])**2;
 
-        # if dx > TOL:
-        #     kx = kh;
-        #     ko = kl;
-        # else:
-        #     kx = kl;
-        #     ko = kh;
+        if dx > TOL:
+            kx = kh;
+            ko = kl;
+        else:
+            kx = kl;
+            ko = kh;
 
         C += kh*dx;
         C += kl*do;
@@ -159,14 +159,15 @@ def obs(x=None):
 
 if __name__ == "__main__":
     # initialize states
-    x0 = [0,0,pi/2];
+    x0 = [-1,-1,pi/2];
     xd = [1,1,3*pi/2];
 
     # create MPC class variable
     PH = 10;
     kl = 2;
     model_type = 'discrete';
-    params = Parameters(x0, xd, PH, buffer_length=25);
+    params = Parameters(x0, xd, PH,
+        buffer_length=25, pause=1e-3);
     mpc_var = mpc.ModelPredictiveControl('ngd', model, cost, params, Nu,
         num_ssvar=Nx, PH_length=PH, knot_length=kl, time_step=dt,
         max_iter=10, model_type=model_type);
