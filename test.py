@@ -166,7 +166,7 @@ if __name__ == "__main__":
     PH = 10;
     kl = 2;
     model_type = 'discrete';
-    params = Parameters(x0, xd, PH, buffer_length=25, pause=0.1);
+    params = Parameters(x0, xd, PH, buffer_length=25);
     mpc_var = mpc.ModelPredictiveControl('ngd', model, cost, params, Nu,
         num_ssvar=Nx, PH_length=PH, knot_length=kl, time_step=dt,
         max_iter=10, model_type=model_type);
