@@ -35,3 +35,15 @@ This can then be converted to the discrete function form using a sufficiently sm
 $$
     x^+ = x + \Delta t \cdot \dot{x}
 $$
+
+Observation Functions Structure:
+
+$$
+\begin{aligned}
+    \Psi_x = \left[ \begin{matrix} x_1 \\ x_2 \\ x_3 \end{matrix} \right]
+    &&
+    \Psi_u = \left[ \begin{matrix} u_1 \\ u_2 \end{matrix} \right]
+    &&
+    h = \left[ \begin{matrix} \cos(x_3) \\ \sin(x_3) \end{matrix} \right]
+\end{aligned}
+$$
