@@ -120,8 +120,8 @@ def cost(mpc_var, xlist, ulist):
 
     # gain parameters
     TOL = 1e-6;
-    kh = 1000;
-    kl = 10;
+    kx = 500;
+    ko = 10;
     ku = 1;
 
     # calculate cost of current input and state
@@ -131,15 +131,8 @@ def cost(mpc_var, xlist, ulist):
         dx = (x[0] - xd[0])**2 + (x[1] - xd[1])**2;
         do = (x[2] - xd[2])**2;
 
-        if dx > TOL:
-            kx = kh;
-            ko = kl;
-        else:
-            kx = kl;
-            ko = kh;
-
-        C += kh*dx;
-        C += kl*do;
+        C += kx*dx;
+        C += ko*do;
 
         if (i != PH):
             C += ku*(ulist[k]**2 + ulist[k+1]**2);
