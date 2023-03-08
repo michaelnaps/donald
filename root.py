@@ -15,6 +15,10 @@ class Motor:
         self.in2.value(0);
         self.en.value(0);
     
+    def drive(self, val):
+        self.en.value(val);
+        return val;
+
     def dirSwitch(self):
         val1 = self.in1.value();
         val2 = self.in2.value();
