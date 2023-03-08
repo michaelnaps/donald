@@ -1,8 +1,3 @@
-# when <--usb
-# orange, yellow
-# grey, purple
-
-import time
 import machine
 
 class Motor:
@@ -27,18 +22,3 @@ class Motor:
         self.in2.value(val1);
 
         return val1, val2;
-
-#--------------------------------------#
-LED = machine.Pin(2, machine.Pin.OUT);
-LED.on();
-
-motPins = ((25, 26, 27), (5, 18, 17));
-
-m1 = Motor(motPins[0]);
-m2 = Motor(motPins[1]);
-
-for i in range(3):
-    LED.on();
-    time.sleep(500/1000);
-    LED.off();
-    time.sleep(500/1000);
