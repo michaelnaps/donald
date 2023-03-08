@@ -1,3 +1,7 @@
+# when <--usb
+# orange, yellow
+# grey, purple
+
 import time
 import machine
 
