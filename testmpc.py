@@ -127,7 +127,7 @@ def cost(mpc_var, xlist, ulist):
     TOL = 1e-6;
     kx = 150;
     ko = 10;
-    ku = 4;
+    ku = 6;
 
     # calculate cost of current input and state
     C = 0;
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     kl = 2;
     model_type = 'discrete';
     params = Parameters(x0, xd, PH,
-        buffer_length=25, pause=1e-2, record=1);
+        buffer_length=50, pause=1e-2, record=1);
     mpc_var = mpc.ModelPredictiveControl('ngd', model, cost, params, Nu,
         num_ssvar=Nx, PH_length=PH, knot_length=kl, time_step=dt,
         max_iter=10, model_type=model_type);
