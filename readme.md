@@ -26,7 +26,7 @@ $$
     = \left[ \begin{matrix}
         \textrm{cos} (x_3) (u_1 + u_2) \\
         \textrm{sin} (x_3) (u_1 + u_2) \\
-        \frac{1}{R} (u_1 + u_2)
+        \frac{1}{R} (u_1 - u_2)
     \end{matrix} \right]
 $$
 
